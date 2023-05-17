@@ -1,0 +1,7 @@
+muntpunt_zebrix.zebrix:
+  path: '/zebrix'
+  defaults:
+    _controller: '\Drupal\muntpunt_zebrix\Controller\ZebrixController::show'
+    _title: 'Zebrix'
+  requirements:
+    _permission: 'access content'

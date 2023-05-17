@@ -1,0 +1,5 @@
+services:
+  muntpunt_zebrix.upcomingEvents:
+    class: Drupal\muntpunt_zebrix\UpcomingEvents
+
+
