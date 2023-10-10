@@ -11,11 +11,32 @@
   src: url('Fonts/FlandersArtSans-Medium.otf') format('opentype');
 }
 
-body{
-  font-family: "FlandersArtSans-Regular";
+@font-face {
+  font-family:  SangBleuKingdom-Medium;
+  src: url('Fonts/SangBleuKingdom-Medium.otf');
+  src: url('Fonts/SangBleuKingdom-Medium.otf') format('opentype');
 }
 
-.tegast{
-  font-family:"FlandersArtSans-Medium";
-  text-decoration:underline;
+body{
+  font-family: "FlandersArtSans-Regular";
+ }
+
+.titelevent{
+ font-family: "FlandersArtSans-Medium";
+}
+.tegast, .datumvandaag{
+  font-family:"SangBleuKingdom-Medium"; 
+  margin:auto;
+}
+
+hr{
+  border-color: black;	
+}
+
+td {
+    vertical-align: top;
+}
+
+table {
+    width: 1047px; 	
 }
