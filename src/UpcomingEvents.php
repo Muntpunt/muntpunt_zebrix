@@ -3,7 +3,7 @@
 namespace Drupal\muntpunt_zebrix;
 
 class UpcomingEvents {
-  private const EVENT_TYPE_NORMAL = '11,24,25,30,26,27,28,31,29,36,44,33,32,9,35,6,20,49,50,52';
+  private const EVENT_TYPE_NORMAL = '11,24,25,30,26,27,28,31,29,36,44,33,32,9,35,6,20,49,50,52,53';
   private const EVENT_TYPE_TE_GAST = '39,48';
   private const WHOLE_DAY = 1;
   private const FROM_NOW = 2;
