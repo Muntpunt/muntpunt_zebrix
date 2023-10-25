@@ -94,7 +94,7 @@ class UpcomingEvents {
   private function printEvents() {
    echo '<table>';	  
    while ($this->daoEvents->fetch()) {
-       if ($_GET['view'] == "intranet"){
+       if (!empty($_GET['view']) && $_GET['view'] == "intranet"){
 		   
          echo '<p style="margin: 0px";><span style="font-size: 13px;">' . $this->daoEvents->title . '</span><br><span style="font-size: 12px;">';
       }else{
