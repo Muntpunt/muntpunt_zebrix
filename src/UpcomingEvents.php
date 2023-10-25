@@ -80,7 +80,7 @@ class UpcomingEvents {
   }
 
   private function printTodaysDate() {
-    if ($_GET['view'] == "intranet"){	 	  
+    if (!empty($_GET['view']) && $_GET['view'] == "intranet"){	 	  
 	    echo '<p style="font-size: 14px;" class="datumvandaag">';
     }else{
 	    echo '<p style="font-size: 90px;" class="datumvandaag">';
@@ -129,7 +129,7 @@ class UpcomingEvents {
   //check if there are events te gast and print "TE GAST"
      if ($this->daoTeGast->N > 0) {
         echo '<table>';
-		if ($_GET['view'] == "intranet"){	    
+		if (!empty($_GET['view']) && $_GET['view'] == "intranet"){	    
 			echo '<p  style="font-size: 15px;" class="tegast">TE GAST</p>';
 		}else{
 			echo '<br/><br/><br/>';
@@ -137,7 +137,7 @@ class UpcomingEvents {
 	}
 	//get all the 'te gast' events
     while ($this->daoTeGast->fetch()) {
-	 	if ($_GET['view'] == "intranet"){
+	 	if (!empty($_GET['view']) && $_GET['view'] == "intranet"){
 			echo '<p style="margin:0px"><span style="font-size: 13px;">' . $this->daoTeGast->title . '</span><br/><span style="font-size: 12px;">';
 		}else{
 			echo '<tr><td width="70%"><span style="font-size: 50px;line-height:60px"; class="titelevent">' . $this->daoTeGast->title . '</span></td><td><span style="font-size: 45px;line-height: 60px">';
