@@ -11,10 +11,9 @@ class UpcomingEvents {
   private $daoEvents;
   private $daoTeGast;
   private const batchsize = 4;
-  //private $offset = 0;
-  
-  public function printUpcomingEvents() {
-    $this->fillDao();
+
+  public function printUpcomingEvents($conferenceRooms) {
+    $this->fillDao($conferenceRooms);
     $this->printHtmlHeader();
     $this->printTodaysDate();
     $this->printEvents();
@@ -22,45 +21,51 @@ class UpcomingEvents {
     $this->printHtmlFooter();
   }
 
-  private function fillDao() {
-    	$offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
-		$offset_guest = isset($_GET['offset_guest']) ? intval($_GET['offset_guest']) : 0;
-		//$this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::WHOLE_DAY, 0 , 100);
-    	//$this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::WHOLE_DAY, 0 , 100);
-		$this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, 0 , 100);
-    	$this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, 0 , 100);
-        if($offset >= $this->daoEvents->N){
+  private function fillDao($conferenceRooms) {
+  	$offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
+	  $offset_guest = isset($_GET['offset_guest']) ? intval($_GET['offset_guest']) : 0;
+
+		$this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, $conferenceRooms, 0 , 100);
+   	$this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, $conferenceRooms,0 , 100);
+
+    if ($offset >= $this->daoEvents->N) {
 			$offset = 0;
 		}
-		if($offset_guest >= $this->daoTeGast->N){
+
+		if ($offset_guest >= $this->daoTeGast->N) {
 			$offset_guest = 0;
 		}
-	   	if ($this->daoEvents->N + $this->daoTeGast->N > self::MAX_NUM_EVENTS) {
-			if ($this->daoTeGast->N > 0){
-				if($this->daoTeGast->N < 4){
-					$limit=8 - $this->daoTeGast->N;
-				}else {
-					$limit = 4;
-				}
-				
-			}else{
-				$limit=8;
-			}
-      		$this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, $offset , $limit);
-      		$this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, $offset_guest, 4);
-		    $nextOffset=$offset + $limit;
-		    $nextOffset_guest = $offset_guest +4;
-			// Output JavaScript to automatically reload the page with the next set of events
-	        echo '<script type="text/javascript">
-	            setTimeout(function() {
-	                window.location.href = "?offset=' . $nextOffset . '&offset_guest='. $nextOffset_guest . '";
-	            }, 10000); // Reload every 7 seconds
-	        </script>';
-    	}else{
-      		$this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, 0, 100);
-      		$this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, 0, 100);
-    	}
-	
+
+    if ($this->daoEvents->N + $this->daoTeGast->N > self::MAX_NUM_EVENTS) {
+    if ($this->daoTeGast->N > 0) {
+      if($this->daoTeGast->N < 4) {
+        $limit = 8 - $this->daoTeGast->N;
+      }
+      else {
+        $limit = 4;
+      }
+    }
+    else {
+      $limit = 8;
+    }
+
+    $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, $offset , $limit);
+    $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, $offset_guest, 4);
+
+    $nextOffset = $offset + $limit;
+    $nextOffset_guest = $offset_guest + 4;
+
+    // Output JavaScript to automatically reload the page with the next set of events
+    echo '<script type="text/javascript">
+      setTimeout(function() {
+        window.location.href = "?offset=' . $nextOffset . '&offset_guest='. $nextOffset_guest . '";
+      }, 10000); // Reload every 10 seconds
+      </script>';
+    }
+    else {
+      $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, 0, 100);
+      $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, 0, 100);
+    }
   }
 
   private function printHtmlHeader() {
@@ -80,11 +85,13 @@ class UpcomingEvents {
   }
 
   private function printTodaysDate() {
-    if (!empty($_GET['view']) && $_GET['view'] == "intranet"){	 	  
+    if (!empty($_GET['view']) && $_GET['view'] == "intranet") {
 	    echo '<p style="font-size: 14px;" class="datumvandaag">';
-    }else{
+    }
+    else {
 	    echo '<p style="font-size: 90px;" class="datumvandaag">';
     }
+
     echo $this->getDateWeekDay() . ' ';
     echo $this->getDateDay() . '.';
     echo $this->getDateMonth();
@@ -92,62 +99,72 @@ class UpcomingEvents {
   }
 
   private function printEvents() {
-   echo '<table>';	  
+   echo '<table>';
    while ($this->daoEvents->fetch()) {
-       if (!empty($_GET['view']) && $_GET['view'] == "intranet"){
-		   
-         echo '<p style="margin: 0px";><span style="font-size: 13px;">' . $this->daoEvents->title . '</span><br><span style="font-size: 12px;">';
-      }else{
-	$title =  $this->daoEvents->title ;
-	if (strpos($title, ':') !== false) {
-    		$parts = explode(':', $title);
-    		$title =  $parts[0] . ":<br>" . $parts[1];
-	}	
-	 echo '<tr><td width="70%"><span style="font-size: 50px;line-height: 60px"; class="titelevent">' . $title . '</span></td><td><span style="font-size: 45px;line-height: 60px ">';
-      }	      
-      $today = date('Y-m-d');
-      $einddatum = $this->daoEvents->Einddatum;
-      if ($einddatum !== $today) {
-        echo 'DOORLOPEND';
-      }
-      else {
-        echo $this->daoEvents->Startuur . ' - ' . $this->daoEvents->Einduur;
-      }
-      $zaal = strtoupper(preg_replace("/\x01/",", ",substr($this->daoEvents->Zaal,1,-1)));
-      //echo '<br/>' . strtoupper(preg_replace("/\x01/",", ",substr($this->daoEvents->Zaal,1,-1))) . '</span></td></tr>'
-	      if ($zaal == "HET HONDERDHANDENHUIS +1"){
-		      echo '<br/>HET HONDERD- HANDENHUIS +1</span></td></tr>';
-	      }else{
-		      echo '<br/>' . $zaal . '</span></td></tr>';
-              }
-      echo '<tr><td colspan="2"><hr ></td></tr>';
+     if (!empty($_GET['view']) && $_GET['view'] == "intranet") {
+       echo '<p style="margin: 0px";><span style="font-size: 13px;">' . $this->daoEvents->title . '</span><br><span style="font-size: 12px;">';
+     }
+     else {
+	     $title =  $this->daoEvents->title ;
+       if (strpos($title, ':') !== false) {
+         $parts = explode(':', $title);
+    		 $title =  $parts[0] . ":<br>" . $parts[1];
+       }
+
+       echo '<tr><td width="70%"><span style="font-size: 50px;line-height: 60px"; class="titelevent">' . $title . '</span></td><td><span style="font-size: 45px;line-height: 60px ">';
+    }
+
+    $today = date('Y-m-d');
+    $einddatum = $this->daoEvents->Einddatum;
+    if ($einddatum !== $today) {
+      echo 'DOORLOPEND';
+    }
+    else {
+      echo $this->daoEvents->Startuur . ' - ' . $this->daoEvents->Einduur;
+    }
+
+    $zaal = strtoupper(preg_replace("/\x01/",", ",substr($this->daoEvents->Zaal,1,-1)));
+
+    if ($zaal == "HET HONDERDHANDENHUIS +1"){
+      echo '<br>HET HONDERD- HANDENHUIS +1</span></td></tr>';
+    }
+    else {
+      echo '<br>' . $zaal . '</span></td></tr>';
+    }
+
+    echo '<tr><td colspan="2"><hr ></td></tr>';
    }
+
    echo '</table>';
   }
 
   private function printEventsTeGast() {
-  //check if there are events te gast and print "TE GAST"
-     if ($this->daoTeGast->N > 0) {
-        echo '<table>';
-		if (!empty($_GET['view']) && $_GET['view'] == "intranet"){	    
-			echo '<p  style="font-size: 15px;" class="tegast">TE GAST</p>';
-		}else{
-			echo '<br/><br/><br/>';
-			echo '<p  style="font-size: 65px;line-height:90px" class="tegast">Te gast</p>';		
-	}
-	//get all the 'te gast' events
-    while ($this->daoTeGast->fetch()) {
-	 	if (!empty($_GET['view']) && $_GET['view'] == "intranet"){
-			echo '<p style="margin:0px"><span style="font-size: 13px;">' . $this->daoTeGast->title . '</span><br/><span style="font-size: 12px;">';
-		}else{
-			echo '<tr><td width="70%"><span style="font-size: 50px;line-height:60px"; class="titelevent">' . $this->daoTeGast->title . '</span></td><td><span style="font-size: 45px;line-height: 60px">';
-		}
+    //check if there are events te gast and print "TE GAST"
+    if ($this->daoTeGast->N > 0) {
+      echo '<table>';
+		  if (!empty($_GET['view']) && $_GET['view'] == "intranet"){
+			  echo '<p  style="font-size: 15px;" class="tegast">TE GAST</p>';
+		  }
+      else {
+        echo '<br><br><br>';
+        echo '<p  style="font-size: 65px;line-height:90px" class="tegast">Te gast</p>';
+    	}
+
+      //get all the 'te gast' events
+      while ($this->daoTeGast->fetch()) {
+        if (!empty($_GET['view']) && $_GET['view'] == "intranet") {
+          echo '<p style="margin:0px"><span style="font-size: 13px;">' . $this->daoTeGast->title . '</span><br><span style="font-size: 12px;">';
+        }
+        else {
+          echo '<tr><td width="70%"><span style="font-size: 50px;line-height:60px"; class="titelevent">' . $this->daoTeGast->title . '</span></td><td><span style="font-size: 45px;line-height: 60px">';
+        }
+
         echo $this->daoTeGast->Startuur . ' -  ' . $this->daoTeGast->Einduur;
-        echo ' <br/> ' . strtoupper(preg_replace("/\x01/", ", ", substr($this->daoTeGast->Zaal, 1, -1))) . '</span></td></tr>';
+        echo ' <br> ' . strtoupper(preg_replace("/\x01/", ", ", substr($this->daoTeGast->Zaal, 1, -1))) . '</span></td></tr>';
         echo '<tr><td colspan="2"><hr ></td></tr>';
-      	}
-     }
-     echo '</table>';
+      }
+    }
+    echo '</table>';
   }
 
   private function printHtmlFooter() {
@@ -204,10 +221,36 @@ class UpcomingEvents {
     return $sqlWhere;
   }
 
+  private function getWhereClauseMuntpuntZaal($conferenceRooms) {
+    if (empty($conferenceRooms)) {
+      return "d.muntpunt_zalen NOT LIKE '' ";
+    }
 
-  private function getEvents($eventTypeList, $period, $offset,$limit) {
+    if (count($conferenceRooms) == 1) {
+      return "d.muntpunt_zalen LIKE '%" . $this->convertConferenceRoom($conferenceRooms[0]) . "%' ";
+    }
+
+    $whereClause = '';
+    foreach ($conferenceRooms as $conferenceRoom) {
+      if ($whereClause != '') {
+        $whereClause .= ' OR ';
+      }
+
+      $whereClause .= " d.muntpunt_zalen LIKE '%" . $this->convertConferenceRoom($conferenceRoom) . "%' ";
+    }
+
+    if ($whereClause) {
+      $whereClause = '(' . $whereClause . ')';
+    }
+
+    return $whereClause;
+  }
+
+
+  private function getEvents($eventTypeList, $period, $conferenceRooms, $offset, $limit) {
     $eventsOfToday = $this->getWhereClauseEventsOfToday($period);
     $eventsStillRunning = $this->getWhereClauseEventsStillRunning();
+    $roomFilter = $this->getWhereClauseMuntpuntZaal($conferenceRooms);
 
     $sql = "
       SELECT
@@ -235,7 +278,7 @@ class UpcomingEvents {
           $eventsStillRunning
         )
       AND
-        d.muntpunt_zalen NOT LIKE ''
+        $roomFilter
       AND
         d.activiteit_status IN (2,5)
       AND
@@ -249,6 +292,25 @@ class UpcomingEvents {
 
     \Drupal::service('civicrm')->initialize();
     return \CRM_Core_DAO::executeQuery($sql);
+  }
+
+  private function convertConferenceRoom($conferenceRoom) {
+    $validRooms = [
+      'zinneke' => 'Zinneke S2',
+      'zinneke1' => 'Zinneke 1, S2',
+      'zinneke2' => 'Zinneke 2, S2',
+      'ketje' => 'Ketje S2',
+      'literairsalon' => 'Literair Salon S1',
+      'mallemunt' => 'Mallemunt S3',
+      'wolken' => 'De Wolken +5',
+    ];
+
+    if (array_key_exists($conferenceRoom, $validRooms)) {
+      return $validRooms[$conferenceRoom];
+    }
+    else {
+      return 'ONGELDIG';
+    }
   }
 
 }
