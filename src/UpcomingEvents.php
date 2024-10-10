@@ -49,8 +49,8 @@ class UpcomingEvents {
       $limit = 8;
     }
 
-    $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, $offset , $limit);
-    $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, $offset_guest, 4);
+    $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, $conferenceRooms, $offset , $limit);
+    $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, $conferenceRooms, $offset_guest, 4);
 
     $nextOffset = $offset + $limit;
     $nextOffset_guest = $offset_guest + 4;
@@ -63,8 +63,8 @@ class UpcomingEvents {
       </script>';
     }
     else {
-      $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, 0, 100);
-      $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, 0, 100);
+      $this->daoEvents = $this->getEvents(self::EVENT_TYPE_NORMAL, self::FROM_NOW, $conferenceRooms, 0, 100);
+      $this->daoTeGast = $this->getEvents(self::EVENT_TYPE_TE_GAST, self::FROM_NOW, $conferenceRooms, 0, 100);
     }
   }
 
