@@ -2,4 +2,4 @@ name: Muntpunt Zebrix
 description: display events on screens
 package: Muntpunt
 type: module
-core_version_requirement: ^9
+core_version_requirement: ^9 || ^10
