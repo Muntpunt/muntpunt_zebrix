@@ -43,6 +43,15 @@ class ZebrixController extends ControllerBase {
           'mallemunt',
         ];
       }
+       if ($_GET['locatie'] == '2deachterbouw') {
+        $rooms = [
+          'zinneke',
+          'zinneke1',
+          'zinneke2',
+          'ketje'
+          ];
+      }
+
     }
 
     if (!empty($_GET['zaal'])) {
