@@ -18,6 +18,7 @@ Geldige zalen zijn:
 - mallemunt
 - literairsalon
 - wolken
+- tribune
 
-De filter zinneke1 en zinneke2 toont ook zinneke (= reservatie van de twee zalan samen).
+De filter zinneke1 en zinneke2 toont ook zinneke (= reservatie van de twee zalen samen).
 

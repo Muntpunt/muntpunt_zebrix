@@ -303,6 +303,7 @@ class UpcomingEvents {
       'literairsalon' => 'Literair Salon S1',
       'mallemunt' => 'Mallemunt S3',
       'wolken' => 'De Wolken +5',
+      'tribune' => 'Agora Tribune', 
     ];
 
     if (array_key_exists($conferenceRoom, $validRooms)) {
